@@ -2,14 +2,16 @@
 import { createContext, useContext, useState } from "react";
 
 import { SafeAuthPack, SafeAuthConfig, SafeAuthInitOptions, SafeAuthUserInfo } from "@safe-global/auth-kit";
+import { AuthKitSignInData } from "@safe-global/auth-kit"; // Add missing import
+
 import { sign } from "crypto";
 import { Button } from "flowbite-react";
 import { useEffect } from "react";
 
-import { createPublicClient, http, custom, createWalletClient, formatEther, hexToBigInt } from "viem";
+import { createPublicClient, http, custom, createWalletClient, formatEther, hexToBigInt, PublicClient, WalletClient } from "viem";
 import { sepolia } from "viem/chains";
 
-const RPC_URL = "https://rpc.sepolia.org";
+import { RPC_URL } from "../constants/constants";
 
 const UserSessionContext = createContext({} as UserSession);
 
@@ -21,13 +23,16 @@ export interface UserSession {
     balance: bigint | null;
     isAuthenticated: boolean;
     safeAuthPack: SafeAuthPack | null;
+    safeAuthSignInResponse: any;
     eoa: string | null;
+    publicClient: PublicClient | null;
+    walletClient: WalletClient | null;
 }
 
 // Making the function which will wrap the whole app using Context Provider
 export default function UserSessionStore({ children }: any) {
     const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack | null>(null);
-    const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<any>(null);
+    const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null | undefined>(null);
     const [eoa, setEoa] = useState<string | null>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [userInfo, setUserInfo] = useState<SafeAuthUserInfo | null>(null);
@@ -37,6 +42,7 @@ export default function UserSessionStore({ children }: any) {
     const [publicClient, setPublicClinet] = useState<any>(null);
 
     useEffect(() => {
+        if (safeAuthSignInResponse == null) return;
         // console.log("safeAuthSignInResponse", safeAuthSignInResponse);
         setEoa(safeAuthSignInResponse?.eoa);
     }, [safeAuthSignInResponse]);
@@ -138,7 +144,21 @@ export default function UserSessionStore({ children }: any) {
     };
 
     return (
-        <UserSessionContext.Provider value={{ login, logout, isAuthenticated, userInfo, chainId, balance, eoa, safeAuthPack }}>
+        <UserSessionContext.Provider
+            value={{
+                login,
+                logout,
+                isAuthenticated,
+                userInfo,
+                chainId,
+                balance,
+                eoa,
+                safeAuthPack,
+                safeAuthSignInResponse,
+                publicClient,
+                walletClient,
+            }}
+        >
             {children}
         </UserSessionContext.Provider>
     );
