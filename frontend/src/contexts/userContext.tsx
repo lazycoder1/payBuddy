@@ -4,6 +4,9 @@ import { createContext, useContext, useState } from "react";
 import { SafeAuthPack, SafeAuthConfig, SafeAuthInitOptions, SafeAuthUserInfo } from "@safe-global/auth-kit";
 import { AuthKitSignInData } from "@safe-global/auth-kit"; // Add missing import
 
+import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
+import { BrowserProvider, Eip1193Provider, ethers } from "ethers";
+
 import { sign } from "crypto";
 import { Button } from "flowbite-react";
 import { useEffect } from "react";
@@ -27,6 +30,7 @@ export interface UserSession {
     eoa: string | null;
     publicClient: PublicClient | null;
     walletClient: WalletClient | null;
+    provider: any;
 }
 
 // Making the function which will wrap the whole app using Context Provider
@@ -40,6 +44,7 @@ export default function UserSessionStore({ children }: any) {
     const [balance, setBalance] = useState<bigint | null>(null);
     const [walletClient, setWalletClient] = useState<any>(null);
     const [publicClient, setPublicClinet] = useState<any>(null);
+    const [provider, setProvider] = useState<any>(null);
 
     useEffect(() => {
         if (safeAuthSignInResponse == null) return;
@@ -119,9 +124,17 @@ export default function UserSessionStore({ children }: any) {
                 setBalance(balance);
                 setWalletClient(walletClient);
                 setPublicClinet(publicClient);
+
+                const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider);
+                const signer = await provider.getSigner();
+                const signerAddress = await signer.getAddress();
+
+                // setChainId((await provider?.getNetwork()).chainId.toString());
+                // setBalance(ethers.formatEther((await provider.getBalance(signerAddress)) as ethers.BigNumberish));
+                setProvider(provider);
             }
         })();
-    }, [isAuthenticated]);
+    }, [isAuthenticated, safeAuthPack]);
 
     const login = async () => {
         const signInInfo = await safeAuthPack?.signIn();
@@ -157,6 +170,7 @@ export default function UserSessionStore({ children }: any) {
                 safeAuthSignInResponse,
                 publicClient,
                 walletClient,
+                provider,
             }}
         >
             {children}

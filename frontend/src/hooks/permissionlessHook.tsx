@@ -8,22 +8,24 @@ import { createSmartAccountClient } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
 
-const PIMLICO_URL = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
+const PIMLICO_URL_V2 = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
+const PIMLICO_URL_V1 = `https://api.pimlico.io/v1/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
 
 export const paymasterClient = createPimlicoPaymasterClient({
-    transport: http(PIMLICO_URL),
+    transport: http(PIMLICO_URL_V2),
 });
 
 export const bundlerClient = createPimlicoBundlerClient({
-    transport: http(PIMLICO_URL),
+    transport: http(PIMLICO_URL_V1),
 });
 
 const usePermissionlessHook = () => {
-    const { login, logout, safeAuthPack, publicClient, isAuthenticated, safeAuthSignInResponse, walletClient } = useUserSession();
-    const [isPermissionlessInitiated, setPermissionlessInitiated] = useState(false);
+    const { login, logout, safeAuthPack, publicClient, isAuthenticated, safeAuthSignInResponse, walletClient, provider } = useUserSession();
+    // const [isPermissionlessInitiated, setPermissionlessInitiated] = useState(false);
 
     const getSafeSmartAccountClientForEOA = async (address: string) => {
-        if (publicClient == null || address == null || !isPermissionlessInitiated || safeAuthSignInResponse == null) return "";
+        console.log("nothing? values needed here", publicClient, address, !safeAuthPack?.isAuthenticated, safeAuthSignInResponse);
+        if (publicClient == null || address == null || !safeAuthPack?.isAuthenticated || safeAuthSignInResponse == null) return "";
 
         const customSigner: Omit<LocalAccount<"custom">, "signTransaction"> = {
             address: address as `0x${string}`,
@@ -36,11 +38,25 @@ const usePermissionlessHook = () => {
             signTypedData: async (typeData: any) => {
                 let signedMessage;
 
-                signedMessage = await walletClient?.signTypedData(typeData);
+                // let signedMessage;
+
+                const params = {
+                    typeData,
+                    from: safeAuthSignInResponse?.eoa,
+                };
+
+                console.log("typedData", typeData);
+                // signedMessage = await walletClient?.signTypedData(typeData);
+                // signedMessage = await (await provider?.getSigner())?.signMessage(typeData);
+                console.log("testing chain ", await provider?.getNetwork());
+                signedMessage = await provider?.send("eth_signTypedData_v4", [params.from, typeData]);
+
+                console.log("signedMessage", signedMessage);
 
                 return signedMessage != undefined ? signedMessage : "0x";
             },
         };
+        console.log("here 1");
 
         const account = await signerToSafeSmartAccount(publicClient, {
             signer: customSigner,
@@ -48,12 +64,16 @@ const usePermissionlessHook = () => {
             entryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
         });
 
+        console.log("here 2");
+
         const smartWalletClient = createSmartAccountClient({
             account,
             chain: VIEM_CHAIN,
-            transport: http(PIMLICO_URL),
+            transport: http(PIMLICO_URL_V2),
             sponsorUserOperation: paymasterClient.sponsorUserOperation,
         });
+
+        console.log("here 3");
 
         return smartWalletClient;
     };
@@ -64,7 +84,7 @@ const usePermissionlessHook = () => {
         if (smartWalletClient == "") return "";
 
         const safeAccountAddress = smartWalletClient.account.address;
-
+        console.log("safeAccountAddress", safeAccountAddress);
         return safeAccountAddress;
     };
 
@@ -75,12 +95,16 @@ const usePermissionlessHook = () => {
 
         const gasPrices = await bundlerClient.getUserOperationGasPrice();
 
+        console.log("safeAccountAddress", smartWalletClient.account.address);
+
         const txHash = await smartWalletClient.sendTransaction({
             to: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
             value: parseEther("0.0"),
             maxFeePerGas: gasPrices.fast.maxFeePerGas, // if using Pimlico
             maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas, // if using Pimlico
         });
+
+        console.log("txHash", txHash);
     };
 
     // const customSigner: Omit<LocalAccount<"custom">, "signTransaction"> = {
@@ -96,13 +120,7 @@ const usePermissionlessHook = () => {
     //     },
     // };
 
-    useEffect(() => {
-        if (!!safeAuthPack?.isAuthenticated) {
-            setPermissionlessInitiated(true);
-        }
-    }, [isAuthenticated]);
-
-    return { isPermissionlessInitiated, getSafeSmartAddressForEOA };
+    return { getSafeSmartAddressForEOA, deploySafeSmartAccount };
 };
 
 export default usePermissionlessHook;
