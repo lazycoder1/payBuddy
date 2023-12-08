@@ -37,3 +37,4 @@ next-env.d.ts
 
 # pnpm yarn package
 pnpm-lock.yaml
+./frontend/pnpm-lock.yaml
