@@ -8,12 +8,14 @@ import { createSmartAccountClient } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
 
+const PIMLICO_URL = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
+
 export const paymasterClient = createPimlicoPaymasterClient({
-    transport: http(`https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=API_KEY`),
+    transport: http(PIMLICO_URL),
 });
 
 export const bundlerClient = createPimlicoBundlerClient({
-    transport: http("https://api.pimlico.io/v1/CHAIN/rpc?apikey=API_KEY"),
+    transport: http(PIMLICO_URL),
 });
 
 const usePermissionlessHook = () => {
@@ -49,7 +51,7 @@ const usePermissionlessHook = () => {
         const smartWalletClient = createSmartAccountClient({
             account,
             chain: VIEM_CHAIN,
-            transport: http("https://api.pimlico.io/v1/CHAIN/rpc?apikey=" + process.env.NEXT_PUBLIC_PIMLICO_API_KEY),
+            transport: http(PIMLICO_URL),
             sponsorUserOperation: paymasterClient.sponsorUserOperation,
         });
 
@@ -100,7 +102,7 @@ const usePermissionlessHook = () => {
         }
     }, [isAuthenticated]);
 
-    return { isInitiated: isPermissionlessInitiated };
+    return { isPermissionlessInitiated, getSafeSmartAddressForEOA };
 };
 
 export default usePermissionlessHook;
