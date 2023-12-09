@@ -58,7 +58,7 @@ export default function UserSessionStore({ children }: any) {
         const chainId = params.get("chainId");
 
         const safeAuthConfig: SafeAuthConfig = {
-            txServiceUrl: "https://safe-transaction-base-goerli.safe.global",
+            txServiceUrl: "https://safe-transaction-sepoliai.safe.global",
         };
 
         (async () => {
