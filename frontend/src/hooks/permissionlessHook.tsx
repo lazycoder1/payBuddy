@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 import { useUserSession } from "../contexts/userContext";
 import { signerToSafeSmartAccount } from "permissionless/accounts";
-import { LocalAccount, WalletClient, createPublicClient, http, parseEther } from "viem";
+import { LocalAccount, TypedDataDefinition, WalletClient, createPublicClient, http, parseEther } from "viem";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
@@ -36,24 +36,33 @@ const usePermissionlessHook = () => {
                 return "0x..";
             },
             signTypedData: async (typeData: any) => {
+                const _typeData = typeData as TypedDataDefinition;
                 let signedMessage;
 
                 // let signedMessage;
 
+                console.log("typeData", typeData);
                 const params = {
-                    typeData,
-                    from: safeAuthSignInResponse?.eoa,
+                    domain: _typeData.domain,
+                    types: {
+                        [_typeData.primaryType]: _typeData.types[_typeData.primaryType],
+                    },
+                    message: _typeData.message,
+                    primaryType: _typeData.primaryType,
                 };
 
-                console.log("typedData", typeData);
+                console.log("typedData", typeData, params);
                 // signedMessage = await walletClient?.signTypedData(typeData);
                 // signedMessage = await (await provider?.getSigner())?.signMessage(typeData);
                 console.log("testing chain ", await provider?.getNetwork());
-                signedMessage = await provider?.send("eth_signTypedData_v4", [params.from, typeData]);
+                // signedMessage = await provider?.send("eth_signTypedData_v4", [safeAuthSignInResponse?.eoa, params]);
 
-                console.log("signedMessage", signedMessage);
+                const signature = await (await provider?.getSigner())?.signTypedData(params.domain, params.types, params.message);
+                console.log("signature", signature);
 
-                return signedMessage != undefined ? signedMessage : "0x";
+                // console.log("signedMessage", signedMessage);
+
+                return signature != undefined ? signature : "0x";
             },
         };
         console.log("here 1");
@@ -69,7 +78,7 @@ const usePermissionlessHook = () => {
         const smartWalletClient = createSmartAccountClient({
             account,
             chain: VIEM_CHAIN,
-            transport: http(PIMLICO_URL_V2),
+            transport: http(PIMLICO_URL_V1),
             sponsorUserOperation: paymasterClient.sponsorUserOperation,
         });
 
@@ -94,9 +103,6 @@ const usePermissionlessHook = () => {
         if (smartWalletClient == "") return "";
 
         const gasPrices = await bundlerClient.getUserOperationGasPrice();
-
-        console.log("safeAccountAddress", smartWalletClient.account.address);
-
         const txHash = await smartWalletClient.sendTransaction({
             to: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
             value: parseEther("0.0"),
