@@ -1,11 +1,13 @@
 "use client";
+import dynamic from "next/dynamic";
+
 import { createContext, useContext, useState } from "react";
 
 import { SafeAuthPack, SafeAuthConfig, SafeAuthInitOptions, SafeAuthUserInfo } from "@safe-global/auth-kit";
 import { AuthKitSignInData } from "@safe-global/auth-kit"; // Add missing import
 
 import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
-import { BrowserProvider, Eip1193Provider, ethers } from "ethers";
+// import { ethers } from "ethers";
 
 import { sign } from "crypto";
 import { Button } from "flowbite-react";
@@ -35,6 +37,7 @@ export interface UserSession {
 
 // Making the function which will wrap the whole app using Context Provider
 export default function UserSessionStore({ children }: any) {
+    // if (window == null) return;
     const [safeAuthPack, setSafeAuthPack] = useState<SafeAuthPack | null>(null);
     const [safeAuthSignInResponse, setSafeAuthSignInResponse] = useState<AuthKitSignInData | null | undefined>(null);
     const [eoa, setEoa] = useState<string | null>(null);
@@ -47,12 +50,14 @@ export default function UserSessionStore({ children }: any) {
     const [provider, setProvider] = useState<any>(null);
 
     useEffect(() => {
+        if (window == null) return;
         if (safeAuthSignInResponse == null) return;
         // console.log("safeAuthSignInResponse", safeAuthSignInResponse);
         setEoa(safeAuthSignInResponse?.eoa);
     }, [safeAuthSignInResponse]);
 
     useEffect(() => {
+        if (window == null) return;
         // @ts-expect-error - Missing globals
 
         const params = new URL(window.document.location).searchParams;
@@ -95,12 +100,15 @@ export default function UserSessionStore({ children }: any) {
     }, []);
 
     useEffect(() => {
+        if (window == null) return;
         if (!safeAuthPack || !isAuthenticated) return;
         (async () => {
             const web3Provider = safeAuthPack.getProvider();
             const userInfo = await safeAuthPack.getUserInfo();
 
             setUserInfo(userInfo);
+
+            console.log("storing userInfo", userInfo);
 
             if (web3Provider) {
                 const [account] = await web3Provider.request({ method: "eth_requestAccounts" });
@@ -126,7 +134,9 @@ export default function UserSessionStore({ children }: any) {
                 setWalletClient(walletClient);
                 setPublicClinet(publicClient);
 
-                const provider = new BrowserProvider(safeAuthPack.getProvider() as Eip1193Provider);
+                const { BrowserProvider } = (await import("ethers")).default;
+
+                const provider = new BrowserProvider(safeAuthPack.getProvider() as any);
                 const signer = await provider.getSigner();
                 const signerAddress = await signer.getAddress();
 

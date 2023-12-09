@@ -2,8 +2,11 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
-
+import dynamic from "next/dynamic";
 import { Providers } from "../contexts/providers";
+// import UserSessionStore from "../contexts/userContext";
+import Theme from "@/contexts/theme-toggle";
+
 import UserSessionStore from "../contexts/userContext";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -14,11 +17,14 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+    if (typeof window == undefined) return null;
     return (
         <html lang="en">
             <body className={inter.className}>
                 <Providers>
-                    <UserSessionStore>{children}</UserSessionStore>
+                    <Theme>
+                        <UserSessionStore>{children}</UserSessionStore>
+                    </Theme>
                 </Providers>
             </body>
         </html>

@@ -59,6 +59,7 @@ const usePermissionlessHook = () => {
             signer: customSigner,
             safeVersion: "1.4.1",
             entryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
+            safeModules: ["0xbdb2edccf443fa7ca2ca3d0cae6d7e6859461143"],
         });
 
         console.log("here 2");
@@ -117,7 +118,7 @@ const usePermissionlessHook = () => {
         });
 
         console.log("txHash", txHash);
-
+        smartWalletClient.sendTransactions;
         return txHash;
     };
 
