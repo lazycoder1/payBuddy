@@ -1,4 +1,4 @@
-[
+export const MODULE_FACTORY_ABI = [
     {
         inputs: [
             { internalType: "enum ModuleFactory.ModuleType", name: "moduleType", type: "uint8" },

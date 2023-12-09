@@ -1,4 +1,4 @@
-[
+export const ISAFE_ABI = [
     {
         anonymous: false,
         inputs: [{ indexed: true, internalType: "address", name: "owner", type: "address" }],

@@ -1,4 +1,4 @@
-[
+export const BASE_MODULE_ABI = [
     {
         inputs: [{ internalType: "contract ISafe", name: "_safe", type: "address" }],
         stateMutability: "nonpayable",

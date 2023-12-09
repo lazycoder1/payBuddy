@@ -57,12 +57,12 @@ const usePermissionlessHook = () => {
                 console.log("testing chain ", await provider?.getNetwork());
                 // signedMessage = await provider?.send("eth_signTypedData_v4", [safeAuthSignInResponse?.eoa, params]);
 
-                const signature = await (await provider?.getSigner())?.signTypedData(params.domain, params.types, params.message);
-                console.log("signature", signature);
+                signedMessage = await (await provider?.getSigner())?.signTypedData(params.domain, params.types, params.message);
+                console.log("signature", signedMessage);
 
                 // console.log("signedMessage", signedMessage);
 
-                return signature != undefined ? signature : "0x";
+                return signedMessage != undefined ? signedMessage : "0x";
             },
         };
         console.log("here 1");
@@ -131,7 +131,7 @@ const usePermissionlessHook = () => {
         console.log("txHash", txHash);
     };
 
-    return { getSafeSmartAddressForEOA, deploySafeSmartAccount };
+    return { getSafeSmartAddressForEOA, deploySafeSmartAccount, sendTransaction };
 };
 
 export default usePermissionlessHook;
