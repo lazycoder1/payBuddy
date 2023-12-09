@@ -113,18 +113,23 @@ const usePermissionlessHook = () => {
         console.log("txHash", txHash);
     };
 
-    // const customSigner: Omit<LocalAccount<"custom">, "signTransaction"> = {
-    //     address: "0x00",
-    //     publicKey: "0x00",
-    //     source: "custom",
-    //     type: "local",
-    //     signMessage: async ({ message }: { message: any }) => {
-    //         return "0x..";
-    //     },
-    //     signTypedData: async (typeData: any) => {
-    //         return "0x00";
-    //     },
-    // };
+    const sendTransaction = async (address: string, to: `0x${string}`, value: string, data: `0x${string}`) => {
+        const smartWalletClient = await getSafeSmartAccountClientForEOA(address);
+
+        if (smartWalletClient == "") return "";
+
+        const gasPrices = await bundlerClient.getUserOperationGasPrice();
+
+        const txHash = await smartWalletClient.sendTransaction({
+            to: to,
+            data: data,
+            value: parseEther(value),
+            maxFeePerGas: gasPrices.fast.maxFeePerGas, // if using Pimlico
+            maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas, // if using Pimlico
+        });
+
+        console.log("txHash", txHash);
+    };
 
     return { getSafeSmartAddressForEOA, deploySafeSmartAccount };
 };
