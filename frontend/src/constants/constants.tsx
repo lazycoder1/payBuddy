@@ -5,4 +5,4 @@ export const CHAIN_NAME = sepolia.name;
 export const VIEM_CHAIN = sepolia;
 export const RPC_URL = "https://rpc.sepolia.org";
 
-export const MODULE_FACTORY_ADDRESS = "0xefdb51f5def28c91c1ae95dc0ac9dee381f26330";
+export const MODULE_FACTORY_ADDRESS = "0x07284087c92fa99dc7cb973ffabd56bad102494a";

@@ -17,7 +17,7 @@ const style = {
 export default function Home() {
     const { login, logout, safeAuthPack, userInfo, chainId, balance, eoa, isAuthenticated } = useUserSession();
     const { getSafeSmartAddressForEOA, deploySafeSmartAccount } = usePermissionlessHook();
-    const { deployModule } = useModuleHook();
+    const { deployModule, getModuleAddress } = useModuleHook();
 
     return (
         <main className={style.wrapper}>
@@ -30,6 +30,8 @@ export default function Home() {
                     <Button onClick={() => getSafeSmartAddressForEOA(eoa ? eoa : "0x")}>Get Address in console</Button>
                     <Button onClick={() => deploySafeSmartAccount(eoa ? eoa : "0x")}>Deploy Safe Smart Account</Button>
                     <Button onClick={() => deployModule(eoa ? eoa : "0x")}>Deploy Module</Button>
+                    <Button onClick={() => getModuleAddress(eoa ? eoa : "0x")}>Get Module Address</Button>
+                    {/* <Button onClick={() => removeModule(eoa ? eoa : "0x")}>Deploy Module</Button> */}
                 </div>
             ) : null}
             <h1>Footer</h1>

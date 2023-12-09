@@ -54,6 +54,7 @@ export default function UserSessionStore({ children }: any) {
 
     useEffect(() => {
         // @ts-expect-error - Missing globals
+
         const params = new URL(window.document.location).searchParams;
         const chainId = params.get("chainId");
 
@@ -145,6 +146,8 @@ export default function UserSessionStore({ children }: any) {
 
         setIsAuthenticated(true);
     };
+
+    // const removeModule = async
 
     const logout = async () => {
         await safeAuthPack?.signOut();

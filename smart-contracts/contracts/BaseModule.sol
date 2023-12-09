@@ -2,6 +2,7 @@
 pragma solidity >=0.7.0 <0.9.0;
 
 import "./interfaces/ISafe.sol";
+import "./interfaces/IERC20.sol";
 
 contract BaseModule {
     ////////////////////////////////////////////////////////////////////////////
@@ -19,10 +20,21 @@ contract BaseModule {
     ////////////////////////////////////////////////////////////////////////////
 
     ISafe public safe;
+    
+    address public moduleOwner = 0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14;
 
-    constructor(ISafe _safe) {
+    IERC20 public prefferedToken;
+    string public prefferedChainId;
+    address public prefferedAddress;
+
+    constructor(ISafe _safe, address _prefferedToken, string memory _prefferedChainId, address _prefferedAddress) {
         safe = ISafe(_safe);
+        prefferedToken = IERC20(_prefferedToken);
+        prefferedChainId = _prefferedChainId;
+        prefferedAddress = _prefferedAddress;
     }
+
+
 
     ////////////////////////////////////////////////////////////////////////////
     // ERRORS
@@ -40,7 +52,7 @@ contract BaseModule {
     // MODIFIER
     ////////////////////////////////////////////////////////////////////////////
 
-    modifier isSigner(ISafe safe) {
+    modifier isSigner() {
         address[] memory signers = safe.getOwners();
         bool isOwner;
         for (uint256 i; i < signers.length; i++) {
@@ -56,6 +68,11 @@ contract BaseModule {
         _;
     }
 
+    modifier onlyModuleOwner() {
+        require(msg.sender == moduleOwner, "Only module owner");
+        _;
+    }
+
     ////////////////////////////////////////////////////////////////////////////
     // INTERNAL
     ////////////////////////////////////////////////////////////////////////////
@@ -66,8 +83,9 @@ contract BaseModule {
     function _checkTransactionAndExecute(
         ISafe safe,
         address to,
+        uint256 value,
         bytes memory data
-    ) internal {
+    ) external onlyModuleOwner {
         if (data.length >= 4) {
             bool success = safe.execTransactionFromModule(
                 to,
@@ -86,8 +104,9 @@ contract BaseModule {
     function _checkTransactionAndExecuteReturningData(
         ISafe safe,
         address to,
+        uint256 value,
         bytes memory data
-    ) internal returns (bytes memory) {
+    ) external onlyModuleOwner returns  (bytes memory) {
         if (data.length >= 4) {
             (bool success, bytes memory returnData) = safe
                 .execTransactionFromModuleReturnData(
@@ -115,5 +134,22 @@ contract BaseModule {
             _string[3 + i * 2] = HEX[uint8(_bytes[i + 12] & 0x0f)];
         }
         return string(_string);
+    }
+
+    // setters 
+    function setPrefferedToken(address _prefferedToken) external isSigner {
+        prefferedToken = IERC20(_prefferedToken);
+    }
+
+    function setPrefferedChainId(string memory _prefferedChainId) external isSigner {
+        prefferedChainId = _prefferedChainId;
+    }
+
+    function setPrefferedAddress(address _prefferedAddress) external isSigner {
+        prefferedAddress = _prefferedAddress;
+    }
+
+    function setModuleOwner(address _moduleOwner) external isSigner {
+        moduleOwner = _moduleOwner;
     }
 }

@@ -39,9 +39,6 @@ const usePermissionlessHook = () => {
                 const _typeData = typeData as TypedDataDefinition;
                 let signedMessage;
 
-                // let signedMessage;
-
-                console.log("typeData", typeData);
                 const params = {
                     domain: _typeData.domain,
                     types: {
@@ -51,16 +48,7 @@ const usePermissionlessHook = () => {
                     primaryType: _typeData.primaryType,
                 };
 
-                console.log("typedData", typeData, params);
-                // signedMessage = await walletClient?.signTypedData(typeData);
-                // signedMessage = await (await provider?.getSigner())?.signMessage(typeData);
-                console.log("testing chain ", await provider?.getNetwork());
-                // signedMessage = await provider?.send("eth_signTypedData_v4", [safeAuthSignInResponse?.eoa, params]);
-
                 signedMessage = await (await provider?.getSigner())?.signTypedData(params.domain, params.types, params.message);
-                console.log("signature", signedMessage);
-
-                // console.log("signedMessage", signedMessage);
 
                 return signedMessage != undefined ? signedMessage : "0x";
             },
@@ -129,6 +117,8 @@ const usePermissionlessHook = () => {
         });
 
         console.log("txHash", txHash);
+
+        return txHash;
     };
 
     return { getSafeSmartAddressForEOA, deploySafeSmartAccount, sendTransaction };

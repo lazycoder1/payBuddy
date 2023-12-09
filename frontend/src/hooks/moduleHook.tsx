@@ -13,6 +13,12 @@ import { MODULE_FACTORY_ADDRESS } from "@/constants/constants";
 // permissionless
 import usePermissionlessHook from "./permissionlessHook";
 import { useUserSession } from "@/contexts/userContext";
+import { ISAFE_ABI } from "@/constants/abis/ISafe";
+import { getModuleAddressForSafe } from "@/utils/module";
+
+// const getTxHashFromUserOp = (userOpHash) => {
+
+// }
 
 const useModuleHook = () => {
     const { sendTransaction, getSafeSmartAddressForEOA } = usePermissionlessHook();
@@ -31,8 +37,6 @@ const useModuleHook = () => {
             publicClient,
         });
 
-        console.log("hrere 11");
-
         const { request } = await publicClient.simulateContract({
             address: MODULE_FACTORY_ADDRESS,
             abi: MODULE_FACTORY_ABI,
@@ -49,10 +53,41 @@ const useModuleHook = () => {
 
         console.log("callData", callData);
 
-        sendTransaction(eoa, MODULE_FACTORY_ADDRESS, "0", callData);
+        const moduleMintTxHash = sendTransaction(eoa, MODULE_FACTORY_ADDRESS, "0", callData);
     };
 
-    return { deployModule };
+    const getModuleAddress = async (eoa: string) => {
+        if (publicClient == null) return;
+
+        const safeAddress = await getSafeSmartAddressForEOA(eoa);
+
+        console.log(safeAddress);
+
+        const moduleAddress = getModuleAddressForSafe(safeAddress, publicClient);
+    };
+
+    // const removeModule = async (eoa: string) => {
+    //     if (publicClient == null) return;
+
+    //     const safeAddress = await getSafeSmartAddressForEOA(eoa);
+
+    //     console.log(safeAddress);
+
+    //     const callData = encodeFunctionData({
+    //         abi: ISAFE_ABI,
+    //         functionName: "disableModule",
+    //         args: ["0x39E54Bb2b3Aa444b4B39DEe15De3b7809c36Fc38", "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14"],
+    //     });
+
+    //     console.log("callData", callData);
+
+    //     sendTransaction(eoa, MODULE_FACTORY_ADDRESS, "0", callData);
+    // };
+
+    // const removeMoule2 = async (eoa: string) => {
+    //     if (publicClient == null) return;
+
+    return { deployModule, getModuleAddress };
 };
 
 export default useModuleHook;
