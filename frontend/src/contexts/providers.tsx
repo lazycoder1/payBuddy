@@ -1,37 +1,44 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState, useContext } from "react";
+
+import { googleWallet, facebookWallet, githubWallet, discordWallet, twitchWallet, twitterWallet } from "@zerodev/wagmi/rainbowkit";
 import { RainbowKitProvider, getDefaultWallets, connectorsForWallets, darkTheme } from "@rainbow-me/rainbowkit";
 import { argentWallet, trustWallet, ledgerWallet } from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { configureChains, createConfig, sepolia, WagmiConfig } from "wagmi";
 import { mainnet, polygon, optimism, arbitrum, base, zora, goerli } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
+import { infuraProvider } from "wagmi/providers/infura";
+import { ALLOWED_CHAINS } from "../constants/constants";
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-    [mainnet, polygon, optimism, arbitrum, base, zora, ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [goerli] : [])],
-    [publicProvider()]
-);
+import { useWalletClient, useAccount, useConnect, usePublicClient } from "wagmi";
+
+const ZERO_DEV_KEY = process.env.NEXT_PUBLIC_ZERODEV as string;
 
 const projectId = process.env.NEXT_PUBLIC_RAINBOW_PROJECT_ID as string;
 
 console.log(projectId);
-
-const { wallets } = getDefaultWallets({
-    appName: "RainbowKit demo",
-    projectId,
-    chains,
-});
 
 const demoAppInfo = {
     appName: "Rainbowkit Demo",
 };
 
 const connectors = connectorsForWallets([
-    ...wallets,
     {
-        groupName: "Other",
-        wallets: [argentWallet({ projectId, chains }), trustWallet({ projectId, chains }), ledgerWallet({ projectId, chains })],
+        groupName: "Social",
+        wallets: [
+            googleWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+            facebookWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+            githubWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+            discordWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+            twitchWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+            twitterWallet({ chains: ALLOWED_CHAINS, options: { projectId: ZERO_DEV_KEY } }),
+        ],
     },
+]);
+
+const { chains, publicClient, webSocketPublicClient } = configureChains(ALLOWED_CHAINS, [
+    infuraProvider({ apiKey: process.env.NEXT_PUBLIC_INFURA as string }),
 ]);
 
 const wagmiConfig = createConfig({

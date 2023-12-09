@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 
-import { useUserSession } from "../contexts/userContext";
+// import { useUserSession } from "../contexts/userContext";
 import { signerToSafeSmartAccount } from "permissionless/accounts";
 import { LocalAccount, WalletClient, createPublicClient, http, parseEther } from "viem";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
+import useWagmiHook from "./wagmiHook";
+import { usePublicClient } from "wagmi";
 
 const PIMLICO_URL_V2 = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
 const PIMLICO_URL_V1 = `https://api.pimlico.io/v1/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
@@ -20,12 +22,13 @@ export const bundlerClient = createPimlicoBundlerClient({
 });
 
 const usePermissionlessHook = () => {
-    const { login, logout, safeAuthPack, publicClient, isAuthenticated, safeAuthSignInResponse, walletClient, provider } = useUserSession();
+    // const { login, logout, safeAuthPack, publicClient, isAuthenticated, safeAuthSignInResponse, walletClient, provider } = useUserSession();
     // const [isPermissionlessInitiated, setPermissionlessInitiated] = useState(false);
+    const { chainId, balance, walletClient, isConnected, eoa } = useWagmiHook();
+    const publicClient = usePublicClient();
 
     const getSafeSmartAccountClientForEOA = async (address: string) => {
-        console.log("nothing? values needed here", publicClient, address, !safeAuthPack?.isAuthenticated, safeAuthSignInResponse);
-        if (publicClient == null || address == null || !safeAuthPack?.isAuthenticated || safeAuthSignInResponse == null) return "";
+        if (publicClient == null || !isConnected) return "";
 
         const customSigner: Omit<LocalAccount<"custom">, "signTransaction"> = {
             address: address as `0x${string}`,
@@ -37,21 +40,8 @@ const usePermissionlessHook = () => {
             },
             signTypedData: async (typeData: any) => {
                 let signedMessage;
-
-                // let signedMessage;
-
-                const params = {
-                    typeData,
-                    from: safeAuthSignInResponse?.eoa,
-                };
-
-                console.log("typedData", typeData);
-                // signedMessage = await walletClient?.signTypedData(typeData);
-                // signedMessage = await (await provider?.getSigner())?.signMessage(typeData);
-                console.log("testing chain ", await provider?.getNetwork());
-                signedMessage = await provider?.send("eth_signTypedData_v4", [params.from, typeData]);
-
-                console.log("signedMessage", signedMessage);
+                console.log("typeData", typeData);
+                signedMessage = await walletClient?.signTypedData(typeData);
 
                 return signedMessage != undefined ? signedMessage : "0x";
             },

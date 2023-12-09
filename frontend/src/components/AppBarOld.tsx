@@ -2,7 +2,14 @@ import { Button, Navbar, NavbarBrand, NavbarCollapse, NavbarLink, NavbarToggle }
 import { SafeAuthUserInfo } from "@safe-global/auth-kit";
 import { ConnectButton as RainbowKitConnectButton } from "@rainbow-me/rainbowkit";
 
-const AppBar = () => {
+type AppBarProps = {
+    isLoggedIn: boolean;
+    onLogin: () => void;
+    onLogout: () => void;
+    userInfo?: SafeAuthUserInfo;
+};
+
+const AppBar = ({ isLoggedIn, onLogin, onLogout, userInfo }: AppBarProps) => {
     return (
         <Navbar fluid rounded>
             {/* <NavbarBrand href="https://flowbite-react.com">

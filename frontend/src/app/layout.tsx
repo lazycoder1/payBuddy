@@ -4,7 +4,7 @@ import "./globals.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import { Providers } from "../contexts/providers";
-import UserSessionStore from "../contexts/userContext";
+// import UserSessionStore from "../contexts/userContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,9 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     return (
         <html lang="en">
             <body className={inter.className}>
-                <Providers>
-                    <UserSessionStore>{children}</UserSessionStore>
-                </Providers>
+                <Providers>{children}</Providers>
             </body>
         </html>
     );
