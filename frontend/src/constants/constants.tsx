@@ -13,5 +13,5 @@ export const PREFFERED_ADDRESS = "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14";
 export const PREFFERED_CHAIN = sepolia.id.toString();
 
 export const SAFE_TX_SERVICE_MAP: { [key: string]: string } = {
-    sepolia: "https://safe-transaction-sepolia.safe.global/",
+    sepolia: "https://safe-transaction-arbitrum.safe.global/",
 };

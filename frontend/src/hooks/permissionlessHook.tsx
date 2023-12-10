@@ -24,6 +24,7 @@ const usePermissionlessHook = () => {
     // const [isPermissionlessInitiated, setPermissionlessInitiated] = useState(false);
 
     const getSafeSmartAccountClientForEOA = async (address: string) => {
+        console.log("address", address);
         console.log("nothing? values needed here", publicClient, address, !safeAuthPack?.isAuthenticated, safeAuthSignInResponse);
         if (publicClient == null || address == null || !safeAuthPack?.isAuthenticated || safeAuthSignInResponse == null) return "";
 
@@ -88,27 +89,32 @@ const usePermissionlessHook = () => {
 
     const deploySafeSmartAccount = async (address: string) => {
         const smartWalletClient = await getSafeSmartAccountClientForEOA(address);
+        console.log("4.1");
 
         if (smartWalletClient == "") return "";
+        console.log("4.2");
 
         const gasPrices = await bundlerClient.getUserOperationGasPrice();
+        console.log("5", smartWalletClient.account.address);
+
         const txHash = await smartWalletClient.sendTransaction({
-            to: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+            to: "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14",
             value: parseEther("0.0"),
             maxFeePerGas: gasPrices.fast.maxFeePerGas, // if using Pimlico
             maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas, // if using Pimlico
         });
+        console.log("6");
 
         console.log("txHash", txHash);
     };
 
     const sendTransaction = async (address: string, to: `0x${string}`, value: string, data: `0x${string}`) => {
         const smartWalletClient = await getSafeSmartAccountClientForEOA(address);
-
+        console.log("4");
         if (smartWalletClient == "") return "";
 
         const gasPrices = await bundlerClient.getUserOperationGasPrice();
-
+        console.log("5", smartWalletClient.account.address);
         const txHash = await smartWalletClient.sendTransaction({
             to: to,
             data: data,
@@ -116,6 +122,7 @@ const usePermissionlessHook = () => {
             maxFeePerGas: gasPrices.fast.maxFeePerGas, // if using Pimlico
             maxPriorityFeePerGas: gasPrices.fast.maxPriorityFeePerGas, // if using Pimlico
         });
+        console.log("6", smartWalletClient.account.address);
 
         console.log("txHash", txHash);
         smartWalletClient.sendTransactions;
