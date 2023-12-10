@@ -72,7 +72,7 @@ export default function UserSessionStore({ children }: any) {
                 enableLogging: true,
                 buildEnv: "production",
                 chainConfig: {
-                    chainId: chainId || "0xa4b1",
+                    chainId: chainId || "0xaa36a7",
                     rpcTarget: RPC_URL,
                 },
             };
