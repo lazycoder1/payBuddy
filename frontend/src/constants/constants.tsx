@@ -1,11 +1,11 @@
 import { sepolia } from "wagmi";
 import { arbitrum } from "viem/chains";
 
-export const CHAIN_ID = arbitrum.id.toString();
+export const CHAIN_ID = sepolia.id.toString();
 // export const CHAIN_NAME = arbitrum.name;
-export const CHAIN_NAME = "arbitrum";
-export const VIEM_CHAIN = arbitrum;
-export const RPC_URL = "https://arb-pokt.nodies.app";
+export const CHAIN_NAME = "sepolia";
+export const VIEM_CHAIN = sepolia;
+export const RPC_URL = "https://1rpc.io/sepolia";
 
 export const MODULE_FACTORY_ADDRESS = "0xefdb51f5def28c91c1ae95dc0ac9dee381f26330";
 export const USDC_ADDRESS = "0xae6444fEb36d2B0e4Dc93f1f012882d7C5DB8F2D";

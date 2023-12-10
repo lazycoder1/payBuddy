@@ -8,9 +8,10 @@ import { createSmartAccountClient, sendUserOperation } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
 import { sponsorUserOperation } from "permissionless/actions/pimlico";
+import { arbitrum } from "viem/chains";
 
-const PIMLICO_URL_V2 = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
-const PIMLICO_URL_V1 = `https://api.pimlico.io/v1/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
+const PIMLICO_URL_V2 = `https://api.pimlico.io/v2/sepolia/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
+const PIMLICO_URL_V1 = `https://api.pimlico.io/v1/sepolia/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
 
 export const paymasterClient = createPimlicoPaymasterClient({
     transport: http(PIMLICO_URL_V2),
