@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useUserSession } from "../contexts/userContext";
 import { signerToSafeSmartAccount } from "permissionless/accounts";
 import { LocalAccount, TypedDataDefinition, WalletClient, createPublicClient, http, parseEther } from "viem";
-import { createSmartAccountClient } from "permissionless";
+import { createSmartAccountClient, sendUserOperation } from "permissionless";
 import { createPimlicoPaymasterClient, createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { VIEM_CHAIN, CHAIN_NAME } from "@/constants/constants";
+import { sponsorUserOperation } from "permissionless/actions/pimlico";
 
 const PIMLICO_URL_V2 = `https://api.pimlico.io/v2/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
 const PIMLICO_URL_V1 = `https://api.pimlico.io/v1/${CHAIN_NAME.toLowerCase()}/rpc?apikey=` + process.env.NEXT_PUBLIC_PIMLICO_API_KEY;
@@ -60,7 +61,7 @@ const usePermissionlessHook = () => {
             signer: customSigner,
             safeVersion: "1.4.1",
             entryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
-            safeModules: ["0xbdb2edccf443fa7ca2ca3d0cae6d7e6859461143"],
+            safeModules: ["0xDaEc84b91F7b2ca8D7bed517796812C6B32A2E63"],
         });
 
         console.log("here 2");
@@ -88,6 +89,7 @@ const usePermissionlessHook = () => {
     };
 
     const deploySafeSmartAccount = async (address: string) => {
+        console.log("address", address);
         const smartWalletClient = await getSafeSmartAccountClientForEOA(address);
         console.log("4.1");
 
@@ -95,7 +97,24 @@ const usePermissionlessHook = () => {
         console.log("4.2");
 
         const gasPrices = await bundlerClient.getUserOperationGasPrice();
-        console.log("5", smartWalletClient.account.address);
+        console.log("5..", smartWalletClient.account.address);
+
+        // const userOperation = await smartWalletClient.prepareUserOperationRequest({
+        //     userOperation: {
+        //         callData: await smartWalletClient.account.encodeCallData({
+        //             to: "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14",
+        //             value: parseEther("0.0"),
+        //             data: "0x",
+        //         }),
+        //     },
+        // });
+
+        // userOperation.verificationGasLimit = BigInt(12000);
+
+        // const userOpHash = await sendUserOperation(smartWalletClient, {
+        //     userOperation,
+        //     entryPoint: smartWalletClient.account.entryPoint,
+        // });
 
         const txHash = await smartWalletClient.sendTransaction({
             to: "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14",
@@ -105,7 +124,7 @@ const usePermissionlessHook = () => {
         });
         console.log("6");
 
-        console.log("txHash", txHash);
+        console.log("userOpHash", txHash);
     };
 
     const sendTransaction = async (address: string, to: `0x${string}`, value: string, data: `0x${string}`) => {

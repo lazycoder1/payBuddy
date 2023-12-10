@@ -7,7 +7,7 @@ import { SafeAuthPack, SafeAuthConfig, SafeAuthInitOptions, SafeAuthUserInfo } f
 import { AuthKitSignInData } from "@safe-global/auth-kit"; // Add missing import
 
 import Safe, { EthersAdapter } from "@safe-global/protocol-kit";
-// import { ethers } from "ethers";
+import { BrowserProvider, ethers } from "ethers";
 
 import { sign } from "crypto";
 import { Button } from "flowbite-react";
@@ -133,8 +133,6 @@ export default function UserSessionStore({ children }: any) {
                 setBalance(balance);
                 setWalletClient(walletClient);
                 setPublicClinet(publicClient);
-
-                const { BrowserProvider } = (await import("ethers")).default;
 
                 const provider = new BrowserProvider(safeAuthPack.getProvider() as any);
                 const signer = await provider.getSigner();
