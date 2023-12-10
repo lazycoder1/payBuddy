@@ -10,6 +10,9 @@ import { ISAFE_ABI } from '../constants/abis/ISafe';
 import { ERC20_ABI } from '../constants/abis/ERC20';
 import { getSafeModule } from './safeAPI';
 
+import axios from 'axios';
+import { call } from 'viem/_types/actions/public/call';
+
 const publicClient = createPublicClient({
     transport: http(RPC_URL),
     chain: VIEM_CHAIN
@@ -57,14 +60,64 @@ export const getTransferTokenCalldata = async (safe: string, to: string, amount:
     }
 }
 
-export const executeCalldata = async (calldata: string) => {
-    const { request } = await publicClient.simulateContract({
-        address: account.address,
-        abi: BASE_MODULE_ABI,
-        functionName: "_checkTransactionAndExecute",
-        account,
-        args: ['0x666a8E6F6f768D54D1B90a5195a36Cf370316066', '0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14', 0, calldata],
-    });
 
-    await walletClient.writeContract(request);
+// export async function allowOneInch(amt: string, src: `0x${string}`) {
+//     const { request } = await publicClient.simulateContract({
+//         address: src,
+//         abi: ERC20_ABI,
+//         functionName: "approve",
+//         account,
+//         args: ['0x11111112542D85B3EF69AE05771c2dCCff4fAa26', amt],
+//     });
+
+//     const txData = await walletClient.writeContract(request);
+
+//     console.log(txData, 'txData');
+
+//     await OneInchCall(amt, src);
+// }
+
+export async function OneInchCall(amount: string, src: string) {
+
+    const url = "https://api.1inch.dev/swap/v5.2/42161/swap";
+
+    const config = {
+        headers: {
+            "Authorization": "Bearer ZXN1YI5POhXl8eShorczl71VDGTpsB3a"
+        },
+        params: {
+            "src": src,
+            "dst": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "amount": amount,
+            "from": "0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14",
+            "slippage": "2"
+        }
+    };
+
+
+    try {
+        const response = await axios.get(url, config);
+        console.log(response.data);
+        return response.data;
+    } catch (error) {
+        // console.error(error);
+        return null;
+    }
 }
+
+// allowOneInch('1000000', "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9");
+OneInchCall("100000", "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9");
+
+
+export const executeSwap = async (to: any, data: any, value: any) => {
+    const txData = await publicClient.call({
+        account,
+        to: to,
+        data: data,
+        value: value,
+    })
+
+    console.log(txData, 'txData');
+    return txData;
+}
+
