@@ -41,9 +41,9 @@ contract ModuleFactory {
     /// @dev Deploys the pay buddy module
     /// @notice Deploys a new module
     /// @param safe target safe contract which the module is targeting
-    function createModuleAndEnable(ISafe safe, address token, string memory chainId, address prefferedAddress ) external returns (address) {
+    function createModuleAndEnable(ISafe safe) external returns (address) {
         address module;
-        module = address(new BaseModule(safe, token, chainId, prefferedAddress));
+        module = address(new BaseModule());
         safeToModule[safe] = module;
         return module;
     }

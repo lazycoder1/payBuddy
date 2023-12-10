@@ -23,17 +23,9 @@ contract BaseModule {
     
     address public moduleOwner = 0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14;
 
-    IERC20 public prefferedToken;
-    string public prefferedChainId;
-    address public prefferedAddress;
-
-    constructor(ISafe _safe, address _prefferedToken, string memory _prefferedChainId, address _prefferedAddress) {
-        safe = ISafe(_safe);
-        prefferedToken = IERC20(_prefferedToken);
-        prefferedChainId = _prefferedChainId;
-        prefferedAddress = _prefferedAddress;
-    }
-
+    mapping (address => address) public prefferedAddress;
+    mapping (address => uint256) public prefferedChainId;
+    mapping (address => address) public prefferedToken;
 
 
     ////////////////////////////////////////////////////////////////////////////
@@ -89,7 +81,7 @@ contract BaseModule {
         if (data.length >= 4) {
             bool success = safe.execTransactionFromModule(
                 to,
-                0,
+                value,
                 data,
                 ISafe.Operation.Call
             );
@@ -111,7 +103,7 @@ contract BaseModule {
             (bool success, bytes memory returnData) = safe
                 .execTransactionFromModuleReturnData(
                     to,
-                    0,
+                    value,
                     data,
                     ISafe.Operation.Call
                 );
@@ -137,19 +129,15 @@ contract BaseModule {
     }
 
     // setters 
-    function setPrefferedToken(address _prefferedToken) external isSigner {
-        prefferedToken = IERC20(_prefferedToken);
+    function setPrefferedToken(address _prefferedToken) external {
+        prefferedToken[msg.sender] = _prefferedToken;
     }
 
-    function setPrefferedChainId(string memory _prefferedChainId) external isSigner {
-        prefferedChainId = _prefferedChainId;
+    function setPrefferedChainId(uint256 _prefferedChainId) external {
+        prefferedChainId[msg.sender] = _prefferedChainId;
     }
 
-    function setPrefferedAddress(address _prefferedAddress) external isSigner {
-        prefferedAddress = _prefferedAddress;
-    }
-
-    function setModuleOwner(address _moduleOwner) external isSigner {
-        moduleOwner = _moduleOwner;
+    function setPrefferedAddress(address _prefferedAddress) external {
+        prefferedAddress[msg.sender] = _prefferedAddress;
     }
 }

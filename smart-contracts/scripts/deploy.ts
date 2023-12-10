@@ -7,10 +7,10 @@ async function main() {
 
   // const lockedAmount = parseEther("0.001");
 
-  const moduleFactory = await hre.viem.deployContract("ModuleFactory", []);
+  const moduleFactory = await hre.viem.deployContract("BaseModule", []);
 
   console.log(
-    `ModuleFactory with deployed to ${moduleFactory.address}}`
+    `ModuleFactory with deployed to ${moduleFactory.address}`
   );
 }
 
