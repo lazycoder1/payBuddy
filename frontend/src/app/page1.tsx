@@ -19,6 +19,7 @@ import { StepProgressBar } from "@/components/ProgressBar";
 import NavBar from "@/components/NavBar";
 import PreDeployment from "@/components/PreDeployment";
 import PostDeployment from "@/components/PostDeployment";
+import { Spinner } from "flowbite-react";
 
 const style = {
     wrapper: `h-screen max-h-screen h-min-screen w-screen flex flex-col justify-between`,
@@ -64,9 +65,9 @@ export default function Home1() {
                     setDeployedSafe={setDeployedSafe}
                 />
             )}
-            {!!safeAuthPack?.isAuthenticated && !!deployedSafe && (
-                <Button onClick={() => deploySafeSmartAccount(eoa ? eoa : "0x")}>Deploy Safe Smart Account</Button>
-            )}
+            {/* {!!safeAuthPack?.isAuthenticated && !!deployedSafe && (
+                <Button onClick={() => (eoa ? eoa : "0x")}>Deploy Safe Smart Account</Button>
+            )} */}
         </main>
     );
 }
