@@ -30,13 +30,17 @@ const safeApiKit = new SafeApiKit({
     chainId: BigInt(CHAIN_ID),
 });
 
-export const getSafeData = async (safe: string) => {
+export const getSafeAddressIfDeployed = async (safe: string) => {
     safe = getAddress(safe);
 
-    const safeCreationInfo: SafeCreationInfoResponse = await safeApiKit.getSafeCreationInfo(safe);
+    try {
+        const safeCreationInfo: SafeCreationInfoResponse = await safeApiKit.getSafeCreationInfo(safe);
+    } catch (e) {
+        return "";
+    }
+    // console.log("safeCreatingInfo", safeCreationInfo);
 
-    console.log("safeCreatingInfo", safeCreationInfo);
-    return safeCreationInfo;
+    return safe;
 };
 
 const useModuleHook = () => {
@@ -128,7 +132,7 @@ const useModuleHook = () => {
         if (publicClient == null) return;
         const safeAddress = await getSafeSmartAddressForEOA(eoa);
 
-        const safeData = getSafeData;
+        const safeData = getSafeAddressIfDeployed;
     };
 
     return { deployModule, getModuleAddress };

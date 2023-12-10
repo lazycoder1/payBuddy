@@ -13,7 +13,7 @@ import { SafeAuthUserInfo } from "@safe-global/auth-kit";
 // UI components
 import { useEffect, useState } from "react";
 import { Button } from "flowbite-react";
-import useModuleHook, { getSafeData } from "@/hooks/moduleHook";
+import useModuleHook, { getSafeAddressIfDeployed } from "@/hooks/moduleHook";
 import "react-step-progress-bar/styles.css";
 import { StepProgressBar } from "@/components/ProgressBar";
 import NavBar from "@/components/NavBar";
@@ -35,16 +35,20 @@ export default function Home1() {
 
     useEffect(() => {
         const setDeployedSafeIfDeployed = async () => {
+            console.log("here");
             if (eoa == null) return;
             if (safeAuthPack == null) return;
             if (!!safeAuthPack?.isAuthenticated == false) return;
+            console.log("herereee");
             const safeAddress = await getSafeSmartAddressForEOA(eoa);
-            const safeCreationInfo = await getSafeData(safeAddress);
-            console.log("safeCreationInfo", safeCreationInfo);
+            const safe = await getSafeAddressIfDeployed(safeAddress);
+            if (safe != "") {
+                setDeployedSafe(safe);
+            }
         };
 
         setDeployedSafeIfDeployed();
-    }, [safeAuthPack, eoa]);
+    }, [safeAuthPack, eoa, getSafeSmartAddressForEOA]);
 
     return (
         <main className={style.wrapper}>
