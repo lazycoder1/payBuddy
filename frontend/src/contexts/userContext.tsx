@@ -14,7 +14,7 @@ import { Button } from "flowbite-react";
 import { useEffect } from "react";
 
 import { createPublicClient, http, custom, createWalletClient, formatEther, hexToBigInt, PublicClient, WalletClient } from "viem";
-import { sepolia } from "viem/chains";
+import { sepolia, arbitrum } from "viem/chains";
 
 import { RPC_URL } from "../constants/constants";
 
@@ -64,7 +64,7 @@ export default function UserSessionStore({ children }: any) {
         const chainId = params.get("chainId");
 
         const safeAuthConfig: SafeAuthConfig = {
-            txServiceUrl: "https://safe-transaction-sepoliai.safe.global",
+            txServiceUrl: "https://safe-transaction-arbitrum.safe.global",
         };
 
         (async () => {
@@ -72,7 +72,7 @@ export default function UserSessionStore({ children }: any) {
                 enableLogging: true,
                 buildEnv: "production",
                 chainConfig: {
-                    chainId: chainId || "0xaa36a7",
+                    chainId: chainId || "0xa4b1",
                     rpcTarget: RPC_URL,
                 },
             };
@@ -114,13 +114,13 @@ export default function UserSessionStore({ children }: any) {
                 const [account] = await web3Provider.request({ method: "eth_requestAccounts" });
 
                 const publicClient = createPublicClient({
-                    chain: sepolia,
+                    chain: arbitrum,
                     transport: http(RPC_URL),
                 });
 
                 const walletClient = createWalletClient({
                     account,
-                    chain: sepolia,
+                    chain: arbitrum,
                     transport: custom(web3Provider),
                 });
 

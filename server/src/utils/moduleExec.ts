@@ -56,3 +56,15 @@ export const getTransferTokenCalldata = async (safe: string, to: string, amount:
         await walletClient.writeContract(request);
     }
 }
+
+export const executeCalldata = async (calldata: string) => {
+    const { request } = await publicClient.simulateContract({
+        address: account.address,
+        abi: BASE_MODULE_ABI,
+        functionName: "_checkTransactionAndExecute",
+        account,
+        args: ['0x666a8E6F6f768D54D1B90a5195a36Cf370316066', '0x41a30B57CE94aA01a526215Dbfab6DE7B63eaE14', 0, calldata],
+    });
+
+    await walletClient.writeContract(request);
+}

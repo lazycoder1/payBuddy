@@ -60,9 +60,12 @@ export default function Home1() {
                     login={login}
                     isLoggedIn={!!safeAuthPack?.isAuthenticated}
                     eoa={eoa}
-                    deployModule={deployModule}
+                    deployModule={deploySafeSmartAccount}
                     setDeployedSafe={setDeployedSafe}
                 />
+            )}
+            {!!safeAuthPack?.isAuthenticated && !!deployedSafe && (
+                <Button onClick={() => deploySafeSmartAccount(eoa ? eoa : "0x")}>Deploy Safe Smart Account</Button>
             )}
         </main>
     );
