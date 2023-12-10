@@ -61,23 +61,24 @@ export const getTransferTokenCalldata = async (safe: string, to: string, amount:
 }
 
 
-// export async function allowOneInch(amt: string, src: `0x${string}`) {
-//     const { request } = await publicClient.simulateContract({
-//         address: src,
-//         abi: ERC20_ABI,
-//         functionName: "approve",
-//         account,
-//         args: ['0x11111112542D85B3EF69AE05771c2dCCff4fAa26', amt],
-//     });
+export async function allowOneInch(amt: string, src: `0x${string}`) {
+    const { request } = await publicClient.simulateContract({
+        address: src,
+        abi: ERC20_ABI,
+        functionName: "approve",
+        account,
+        args: ['0x11111112542D85B3EF69AE05771c2dCCff4fAa26', amt],
+    });
 
-//     const txData = await walletClient.writeContract(request);
+    const txData = await walletClient.writeContract(request);
 
-//     console.log(txData, 'txData');
+    console.log(txData, 'txData');
 
-//     await OneInchCall(amt, src);
-// }
+    await OneInchCall(amt, src);
+}
 
 export async function OneInchCall(amount: string, src: string) {
+    // allowOneInch('1000000', "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9");
 
     const url = "https://api.1inch.dev/swap/v5.2/42161/swap";
 
@@ -105,19 +106,28 @@ export async function OneInchCall(amount: string, src: string) {
     }
 }
 
-// allowOneInch('1000000', "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9");
 OneInchCall("100000", "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9");
 
 
 export const executeSwap = async (to: any, data: any, value: any) => {
-    const txData = await publicClient.call({
+    // const txData = await publicClient.call({
+    //     account,
+    //     to: to,
+    //     data: data,
+    //     value: value,
+    // })
+
+    const request = await walletClient.prepareTransactionRequest({
         account,
         to: to,
+        value: BigInt(value),
         data: data,
-        value: value,
     })
 
-    console.log(txData, 'txData');
-    return txData;
+    const signature = await walletClient.signTransaction(request)
+
+    const hash = await walletClient.sendRawTransaction({ serializedTransaction: signature })
+    console.log(hash);
+    return hash;
 }
 
