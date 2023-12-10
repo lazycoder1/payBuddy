@@ -62,7 +62,7 @@ const usePermissionlessHook = () => {
             signer: customSigner,
             safeVersion: "1.4.1",
             entryPoint: "0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789",
-            safeModules: ["0xDaEc84b91F7b2ca8D7bed517796812C6B32A2E63"],
+            safeModules: ["0x9f28ca6903cfef1ea449afdd723e7ceaaed74514"],
         });
 
         console.log("here 2");
