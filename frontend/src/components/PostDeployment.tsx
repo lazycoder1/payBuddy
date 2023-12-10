@@ -24,6 +24,9 @@ const PreDeployment = ({ safeAddress }: Props) => {
                             >
                                 Safe dashbaard
                             </a>
+                            <p className="mb-8 text-lg font-light text-red-200 dark:text-red-200">
+                                Note: Currently all funds will be swaped to USDC and deposited in your safe{" "}
+                            </p>
                         </>
                     </>
                 </div>
